@@ -1,0 +1,78 @@
+[
+  {
+    "id": 0,
+    "level": 1,
+    "key": "from",
+    "title": "Array.__()方法从一个类似数组或可迭代对象中创建一个新的，浅拷贝的数组实例",
+    "desc": "([1, 2, 3], x => x + x)  //expected output: [2,4,6]",
+    "error_count": 0,
+    "tabs": [
+      "Array"
+    ]
+  },
+  {
+    "id": 1,
+    "level": 0,
+    "key": "concat",
+    "title": "Array.prototype.__()用于合并两个或多个数组的非变异方法是？（不会更改现有数组，而是返回一个新数组）",
+    "desc": "[1,2].__([3,4])  //expected output: [1，2，3，4]",
+    "error_count": 0,
+    "tabs": [
+      "Array"
+    ]
+  },
+  {
+    "id": 2,
+    "level": 1,
+    "key": "of",
+    "title": "Array.__()方法创建一个具有可变参数的新数组实例，而不考虑参数的数量或类型。",
+    "desc": "Array.__(8).length //expected output: 1",
+    "error_count": 0,
+    "tabs": [
+      "Array"
+    ]
+  },
+  {
+    "id": 3,
+    "level": 3,
+    "key": "copyWithin",
+    "title": "Array.prototype.__()会改变原有数组，浅复制数组的一部分到同一数组中的另一个位置，并返回它，不会改变原数组的长度。",
+    "desc": "[1,2,3,6].__(0,2,4)  //expected output: [3,6,3,6]",
+    "error_count": 0,
+    "tabs": [
+      "Array"
+    ]
+  },
+  {
+    "id": 4,
+    "level": 3,
+    "key": "entries",
+    "title": "Array.prototype.__() 方法返回一个新的Array Iterator对象，该对象包含数组中每个索引的键/值对。",
+    "desc": "['a', 'b', 'c'].__().next().value   //expected output: [0,a]",
+    "error_count": 0,
+    "tabs": [
+      "Array"
+    ]
+  },
+  {
+    "id": 5,
+    "level": 3,
+    "key": "fill",
+    "title": "Array.prototype.__() 方法用一个固定值填充一个数组中从起始索引到终止索引内的全部元素。不包括终止索引。",
+    "desc": "[1, 2, 3, 4].__(0,1,3)  //expected output: [1, 0, 0, 4]",
+    "error_count": 0,
+    "tabs": [
+      "Array"
+    ]
+  },{
+    "id": 6,
+    "level": 0,
+    "key": "filter",
+    "title": "Array.prototype.__() 方法创建一个新数组, 其包含函数参数返回为true的所有元素。",
+    "desc": "例如筛选出价格大于200的对象，[1,12,3].__(n => n>10)  //expected output: [12]",
+    "error_count": 0,
+    "tabs": [
+      "Array"
+    ]
+  }
+]
