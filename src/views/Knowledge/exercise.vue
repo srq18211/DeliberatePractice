@@ -1,37 +1,39 @@
 <template>
     <div>
-        <el-page-header @back="$router.back()" content="完型填空专项练习">
-        </el-page-header>
-        <div class="dashbord">
+        <el-card class="dashbord top-border">
+            <div slot="header">数据面板</div>
             <circle-progres :right="right" :total="list.length" :wrong="wrong"></circle-progres>
             <!--            <h1>已经完成：{{completed}}</h1>-->
             <!--            <h1>花费时间</h1>-->
             <p>{{time}}</p>
-        </div>
-        <div class="topic-field">
-            <div class="panel topic">
-                <h1>{{nowTopic.title}}</h1>
-                <h1>{{nowTopic.answer}}</h1>
+        </el-card>
+        <el-card class="top-border">
+            <div slot="header">答题卡</div>
+            <div class="topic-field">
+                <div class="panel topic">
+                    <h1>{{nowTopic.title}}</h1>
+                    <h1>{{nowTopic.answer}}</h1>
+                </div>
+                <el-input
+                        rows="10"
+                        ref="input"
+                        clearable
+                        v-model="input"
+                        placeholder="输入答案"
+                        autofocuse
+                        @keydown.13.native="nextTopic">
+                </el-input>
+                <el-col style="margin-top: 20px;">
+                    <el-button
+                            style="width:100%"
+                            type="primary"
+                            :loading="false"
+                            @click="nextTopic"
+                            ref="nextTopic">下一题
+                    </el-button>
+                </el-col>
             </div>
-            <el-input
-                    rows="10"
-                    ref="input"
-                    clearable
-                    v-model="input"
-                    placeholder="输入答案"
-                    autofocuse
-                    @keydown.13.native="nextTopic">
-            </el-input>
-            <el-col style="margin-top: 20px;">
-                <el-button
-                        style="width:100%"
-                        type="primary"
-                        :loading="false"
-                        @click="nextTopic"
-                        ref="nextTopic">下一题
-                </el-button>
-            </el-col>
-        </div>
+        </el-card>
     </div>
 </template>
 
@@ -77,9 +79,9 @@
                 let total = this.list.length;
                 this.validateInput(this.input, this.nowTopic.answer)
                     .then(() => {
-                        this.index = Math.min(++this.index, total-1)
+                        this.index = Math.min(++this.index, total - 1)
                         this.right = Math.min(total - this.wrong, ++this.right)
-                        this.input=""
+                        this.input = ""
                     }).catch(() => {
                         this.index = Math.min(++this.index, total)
                         this.wrong = Math.min(total - this.right, ++this.wrong)
@@ -98,17 +100,15 @@
                 target: ".el-container",
                 text: "loading"
             });
-            this.$axios.get("/api/topic/list", {
-                id: this.id
-            }).then(rep => {
+            this.$axios.get("/api/topic/list").then(rep => {
                 const list = rep["data"].data;
-                return new Promise((resolve,reject)=>{
-                    list?resolve(list):reject()
+                return new Promise((resolve, reject) => {
+                    list ? resolve(list) : reject()
                 })
             }).then(data => {
                 this.list = this.shuffle(data);
                 loading.close();
-            }).catch(err=>{
+            }).catch(err => {
                 loading.close();
                 // this.$router.back();
             })
@@ -128,16 +128,16 @@
     }
 
     .dashbord {
-        height: 60vh;
         float: left;
         margin-right: 20px;
         @include baseShadow;
         box-sizing: border-box;
         padding: 0 20px;
-        border-top: 5px solid #36cfc9;
-        border-bottom: 5px solid #36cfc9;
+        /*border-bottom: 5px solid #36cfc9;*/
     }
-
+    .top-border{
+        border-top: 5px solid #36cfc9;
+    }
     .topic-field {
         height: 60vh;
         overflow: hidden;

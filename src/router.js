@@ -5,12 +5,12 @@ Vue.use(Router);
 const routes = [
     {
         path: "/knowledge",
-        name: "knowledge",
-        component: resolve => require(['@/views/Knowledge'], resolve),
-    }, {
-        path: "/knowledge/exercise/:id",
         name: "exercise",
         component: resolve => require(['@/views/Knowledge/exercise'], resolve),
+    },{
+        path: "/mgmt",
+        name: "mgmt",
+        component: resolve => require(['@/views/Mgmt'], resolve),
     }
 ];
 routes.forEach(item => item.props = true);

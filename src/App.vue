@@ -17,6 +17,11 @@
 </script>
 
 <style lang="scss">
+    #app{
+        width: 100%;
+        height: 100%;
+        background: #eceef1;
+    }
 .el-container{
     min-height: 600px;
 }
