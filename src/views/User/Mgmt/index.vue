@@ -3,7 +3,7 @@
         <el-card class="box-card">
             <div class="box-card-header" slot="header">
                 <el-button-group>
-                    <el-button round size="mini" icon="el-icon-full-screen" @click="fullscreen">全屏</el-button>
+
                     <el-button round size="mini" icon="el-icon-refresh" @click="queryList">刷新</el-button>
                     <el-input size="mini"
                               style="margin-left:20px;width: 500px;"
@@ -332,9 +332,6 @@
                     }
                 })
             },
-            fullscreen() {
-                document.querySelector('#app').requestFullscreen();
-            },
             queryList() {
                 let params = {};
                 if (this.fuzzyInput) {
@@ -367,7 +364,7 @@
 </script>
 
 <style lang="scss" rel="stylesheet/scss" scoped>
-    @import "../../assets/main";
+    @import "../../../assets/main";
 
     .el-card {
         height: 100%;

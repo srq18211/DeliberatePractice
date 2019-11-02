@@ -2,6 +2,7 @@
     <!-- <div id="app" class="scroll-wrapper"> -->
     <div id="app">
         <el-header>
+            <router-link to="/">home</router-link>
             <router-link to="/exercise">exercise</router-link>
             <router-link to="/mgmt">mgmt</router-link>
         </el-header>
@@ -46,20 +47,41 @@
                 <router-view class="router-view"></router-view>
             </el-main>
         </el-container>
-        <el-footer>Footer</el-footer>
+        <el-footer>
+            <el-row type="flex" justify="space-between">
+                <span>&copy; 2019 xinzejy.cn 京ICP备18018920号 </span>
+                <span><el-button type="text" size="mini" icon="el-icon-full-screen" @click="fullscreen">全屏</el-button></span>
+            </el-row>
+        </el-footer>
     </div>
 </template>
 
 <script>
     export default {
         name: "App",
+        data() {
+            return {
+                time: ""
+            }
+        },
         methods: {
             handleOpen(e) {
                 console.log(e)
             },
             handleClose(e) {
                 console.log(e)
-            }
+            },
+            fullscreen() {
+                document.querySelector('#app').requestFullscreen();
+            },
+        },
+        mounted() {
+            setInterval(() => {
+                this.time = new Date().toLocaleString()
+            })
+        },
+        destroyed() {
+            clearInterval(this.time)
         }
     }
 </script>
@@ -69,7 +91,7 @@
         width: 100%;
         height: 100%;
         background: #eceef1;
-        overflow: scroll;
+        overflow: hidden;
         /*zoom: 0.75;*/
         .el-header, .el-footer {
             color: #fff;

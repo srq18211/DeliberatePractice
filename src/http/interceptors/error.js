@@ -38,14 +38,16 @@ const showStatus = (status) => {
             message = 'HTTP版本不受支持(505)'
             break
         default:
-            message = `连接出错(${status})!`
+            message = `连接出错!`
     }
     return `${message}，请检查网络或联系管理员！`
 }
 export default (error) => {
+    let status=error.response&&error.response.status
+    let message=showStatus(status)||""
     Vue.prototype.$message({
         showClose: true,
-        message: showStatus(error.response.status),
+        message: message,
         type: 'error'
     });
 }
