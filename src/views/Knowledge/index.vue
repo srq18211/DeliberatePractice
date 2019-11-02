@@ -61,11 +61,11 @@
                 target:".el-container",
                 text: "loading"
             });
-            this.$axios.get("/api/topic/tags").then(rep => {
-                const list= rep["data"].data;
-                this.lables = list;
-                loading.close()
-            });
+            // this.$axios.get("/api/topic/tags").then(rep => {
+            //     const list= rep["data"].data;
+            //     this.lables = list;
+            //     loading.close()
+            // });
         }
     };
 </script>

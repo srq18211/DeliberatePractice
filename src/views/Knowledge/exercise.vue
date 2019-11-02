@@ -2,7 +2,9 @@
     <div>
         <el-card class="dashbord top-border">
             <div slot="header">数据面板</div>
-            <circle-progres :right="right" :total="list.length" :wrong="wrong"></circle-progres>
+            <div class="circle-wrap">
+                <circle-progres :right="right" :total="list.length" :wrong="wrong"></circle-progres>
+            </div>
             <!--            <h1>已经完成：{{completed}}</h1>-->
             <!--            <h1>花费时间</h1>-->
             <p>{{time}}</p>
@@ -12,7 +14,7 @@
             <div class="topic-field">
                 <div class="panel topic">
                     <h1>{{nowTopic.title}}</h1>
-                    <h1>{{nowTopic.answer}}</h1>
+<!--                    <h1>{{nowTopic.answer}}</h1>-->
                 </div>
                 <el-input
                         rows="10"
@@ -76,6 +78,7 @@
             },
             //下一道题
             nextTopic() {
+
                 let total = this.list.length;
                 this.validateInput(this.input, this.nowTopic.answer)
                     .then(() => {
@@ -100,8 +103,8 @@
                 target: ".el-container",
                 text: "loading"
             });
-            this.$axios.get("/api/topic/list").then(rep => {
-                const list = rep["data"].data;
+            this.$axios.get("/api/topic/list?pageSize=150").then(rep => {
+                const list = rep["data"].data["listData"];
                 return new Promise((resolve, reject) => {
                     list ? resolve(list) : reject()
                 })
@@ -117,41 +120,33 @@
             setInterval(() => {
                 this.time = new Date().toLocaleString()
             })
+        },
+        destroyed() {
+            clearInterval(this.time)
         }
     };
 </script>
 <style lang="scss" rel="stylesheet/scss" scoped>
     @import "../../assets/main.scss";
 
-    .el-page-header {
-        margin-bottom: 50px;
+    .dashbord {
+        height: 300px;
+
+        .circle-wrap {
+            width: 200px;
+        }
     }
 
-    .dashbord {
-        float: left;
-        margin-right: 20px;
-        @include baseShadow;
-        box-sizing: border-box;
-        padding: 0 20px;
-        /*border-bottom: 5px solid #36cfc9;*/
-    }
-    .top-border{
+    .top-border {
         border-top: 5px solid #36cfc9;
     }
+
     .topic-field {
-        height: 60vh;
+        height: 30vh;
         overflow: hidden;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-
-        .topic {
-            height: 30vh;
-        }
-
-        /*.el-input{*/
-        /*    height: 20vh;*/
-        /*}*/
     }
 
     .panel {
@@ -162,6 +157,8 @@
 
     .topic {
         min-height: 100px;
+        font-size: 20px;
+        line-height: 30px;
     }
 
     .tools {

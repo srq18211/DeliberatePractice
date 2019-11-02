@@ -1,7 +1,16 @@
+const env = process.env.NODE_ENV;
 const AXIOS_CONF = {
-    // baseURL: "http://localhost:8081/mock/11/",
-    baseURL: "/localapi",
-    timeout: 5000
+    baseURL: env === "development"
+        ? "http://localhost:8090"
+        : "http://xinzejy.cn:3000",
+    // baseURL: "/localapi",
+    timeout: 5000,
+    // `transformResponse` 在传递给 then/catch 前，允许修改响应数据
+    transformResponse: [function (data) {
+        data=data.replace(/&lt;/g,"<")
+        data=data.replace(/&gt;/g,">")
+        return JSON.parse(data);
+    }],
     //   headers: { "X-Custom-Header": "foobar" }
 }
 export {

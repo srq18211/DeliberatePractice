@@ -1,5 +1,5 @@
 <template>
-    <svg class="circle-progress" :width="width" :height="height">
+    <svg class="circle-progress" viewBox="0,0,300,300" preserveAspectRatio="xMinYMin meet" >
         <circle class="circle" :cx="cx" :cy="cy" :r="`${r}`" stroke="#eaeef2"></circle>
         <circle class="circle dasharray right" :cx="cx" :cy="cy" :r="`${r}`"
                 :stroke-dasharray="`${totalLength } 99999`">
@@ -67,8 +67,6 @@
         // },
         data() {
             return {
-                width: 300,
-                height: 300,
                 cx: 150,
                 cy: 150,
                 r: 100,
@@ -119,7 +117,7 @@
 <style lang="scss">
     .circle {
         fill: none;
-        stroke-width: 10px;
+        stroke-width: 20px;
     }
 
     .dasharray {

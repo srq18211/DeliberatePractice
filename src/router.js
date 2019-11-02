@@ -4,13 +4,18 @@ import Router from "vue-router";
 Vue.use(Router);
 const routes = [
     {
-        path: "/knowledge",
+        path:"/",
+        name:"index",
+        component: resolve => require(['@/views/Home'], resolve),
+    },
+    {
+        path: "/exercise",
         name: "exercise",
         component: resolve => require(['@/views/Knowledge/exercise'], resolve),
     },{
         path: "/mgmt",
         name: "mgmt",
-        component: resolve => require(['@/views/Mgmt'], resolve),
+        component: resolve => require(['@/views/User/Mgmt'], resolve),
     }
 ];
 routes.forEach(item => item.props = true);

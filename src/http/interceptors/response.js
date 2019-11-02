@@ -1,6 +1,5 @@
 
 export default (response)=>{
-    console.log(response)
     const status = response.status
     let msg = ''
     if (status < 200 || status >= 300) {
