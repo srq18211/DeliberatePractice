@@ -3,7 +3,6 @@
         <el-card class="box-card">
             <div class="box-card-header" slot="header">
                 <el-button-group>
-
                     <el-button round size="mini" icon="el-icon-refresh" @click="queryList">刷新</el-button>
                     <el-input size="mini"
                               style="margin-left:20px;width: 500px;"
@@ -59,7 +58,7 @@
                 <el-table-column
                         prop="title"
                         label="题目"
-                        width="180">
+                        width="200">
                     <template slot-scope="scope">
                         <div style="text-overflow: ellipsis;white-space: nowrap;overflow: hidden">
                             {{scope.row.title}}
@@ -125,6 +124,7 @@
         <!--新增对话框-->
         <el-dialog
                 title="新增题目"
+                :close-on-click-modal="false"
                 :visible.sync="dialogShowInsert"
                 width="500px"
                 @closed="insertHandleClose">
@@ -135,7 +135,8 @@
                 </el-form-item>
                 <el-form-item label="答案"
                               :rules="[{ required: true, message: '答案不能为空'}]">
-                    <el-input type="textarea" rols="10" autosize v-model="payloadInsert.answer"
+                    <el-input type="textarea"
+                              :autosize="{ minRows: 5, maxRows: 50}" v-model="payloadInsert.answer"
                               @keydown.enter.native="remoteInsert"></el-input>
                 </el-form-item>
             </el-form>
@@ -147,6 +148,7 @@
         <!--修改对话框-->
         <el-dialog
                 title="修改题目"
+                :close-on-click-modal="false"
                 :visible.sync="dialogShowUpdate"
                 width="500px"
                 @closed="updateHandleClose">
@@ -157,7 +159,9 @@
                 </el-form-item>
                 <el-form-item label="答案"
                               :rules="[{ required: true, message: '答案不能为空'}]">
-                    <el-input v-model="payloadRow.answer"></el-input>
+                    <el-input   type="textarea"
+                                :autosize="{ minRows: 5, maxRows: 50}"
+                                v-model="payloadRow.answer"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -168,27 +172,7 @@
         <!--删除对话框-->
         <el-dialog
                 title="删除題目"
-                :visible.sync="dialogShowDelete"
-                width="500px"
-                @closed="deleteHandleClose">
-            <!--            <p slot="title"><el-link type="danger">删除</el-link></p>-->
-            <el-alert
-                    style="padding:20px;margin-bottom:20px"
-                    :title="`确认继续操作请输入：${payloadRow.answer}`"
-                    type="error"
-                    :closable="false"
-                    description="目前暫不支持假性刪除，刪除后無法恢復"
-                    show-icon>
-            </el-alert>
-            <el-input v-model="deletePrecheckInput" placeholder="输入题目答案以确认继续删除"></el-input>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="dialogShowDelete = false">取 消</el-button>
-                <el-button type="danger" @click="remoteDelete" :disabled="!deletePermit">确 定</el-button>
-            </span>
-        </el-dialog>
-        <!--添加分类标签-->
-        <el-dialog
-                title="标签编辑"
+                :close-on-click-modal="false"
                 :visible.sync="dialogShowDelete"
                 width="500px"
                 @closed="deleteHandleClose">

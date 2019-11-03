@@ -11,8 +11,7 @@
                         <circle-progres :right="right" :total="list.length" :wrong="wrong"></circle-progres>
                     </div>
                     <div style="height: 50%">
-                        <div v-if="nowTopic.id">ID:</div>
-                        {{nowTopic.id}}<h1>{{nowTopic.title}}</h1>
+                        <span v-if="nowTopic.id">ID:</span>{{nowTopic.id}}<h1>{{nowTopic.title}}</h1>
                     </div>
                 </el-row>
                 <el-row>
@@ -48,14 +47,15 @@
             </div>
         </el-card>
         <el-card>
-            <div slot="header">
-                答案：
+            <el-row slot="header" type="flex" align="center">
                 <el-switch
+                        style="margin-right:20px"
                         v-model="switchV"
                         active-value="1"
                         inactive-value="0">
                 </el-switch>
-            </div>
+                显示答案后提交，不能算作已掌握哦
+            </el-row>
             <span v-if="switchV==='1'">{{nowTopic.answer}}</span>
         </el-card>
         <user-help v-if="guideVisible" :data="guide"></user-help>

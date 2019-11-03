@@ -7,6 +7,7 @@
         <circle class="circle dasharray wrong" :cx="cx" :cy="cy" :r="`${r}`"
                 :stroke-dasharray="`${wrongLength } 99999`">
         </circle>
+
         <text x="150" y="150"
               class="text">
             {{percentage}}
@@ -114,14 +115,14 @@
 <style lang="scss">
     .circle {
         fill: none;
-        stroke-width: 20px;
+        stroke-width: 40px;
     }
 
     .text {
         font-size: 50px;
-        text-anchor:middle;
+        text-anchor: middle;
         dominant-baseline: middle; /* 文本垂直居中 */
-        font-family:fantasy;
+        font-family: fantasy;
     }
 
     .dasharray {

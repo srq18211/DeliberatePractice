@@ -1,10 +1,7 @@
 <template>
     <div class="user_guide_mask" v-show="show">
         <div class="user_guide_view" :style="view"></div>
-        <div class="user_guide_view-top" :style="topMask"></div>
-        <div class="user_guide_view-right" :style="right"></div>
-        <div class="user_guide_view-bottom" :style="bottom"></div>
-        <div class="user_guide_view-left" :style="leftMask"></div>
+
         <div class="user_guide_message" :style="messageStyle">
             <div class="user_guide_text">{{message}}</div>
             <el-button-group style="margin-top: 20px">
@@ -53,44 +50,17 @@
 
             view() {
                 return {
-                    left: this.left + "px",
-                    top: this.top + "px",
+                    left: this.left - 9999 + "px",
+                    top: this.top - 9999 + "px",
                     width: this.width + "px",
                     height: this.height + "px"
                 }
             },
-            topMask() {
-                return {
-                    width: this.width + "px",
-                    left: this.left + "px",
-                    top: this.top + "px",
-                    transform: `translateY(-100%)`
-                }
-            },
-            bottom() {
-                return {
-                    width: this.width + "px",
-                    left: this.left + "px",
-                    top: this.top + "px",
-                    transform: `translateY(${this.height}px)`
-                }
-            },
-            leftMask() {
-                return {
-                    left: this.left + "px",
-                    transform: `translateX(-100%)`
-                }
-            },
-            right() {
-                return {
-                    left: +this.left + +this.width + "px"
-                }
-            },
             messageStyle() {
                 var left = 0;
-                if (this.currentElement.left> 300) {
+                if (this.currentElement.left > 300) {
                     left = this.left - 300
-                }else{
+                } else {
                     left = this.left
                 }
                 return {
@@ -105,15 +75,15 @@
                 this.currentElement = el.getBoundingClientRect() || {}
             },
             pre() {
-                this.index = Math.max(--this.index,0)
+                this.index = Math.max(--this.index, 0)
                 this.getClientSize();
             },
             next() {
-                if(this.index===this.data.length-1){
+                if (this.index === this.data.length - 1) {
                     this.close();
                     return
                 }
-                this.index = Math.min(++this.index,this.data.length-1);
+                this.index = Math.min(++this.index, this.data.length - 1);
                 this.getClientSize();
             },
             close() {
@@ -121,6 +91,9 @@
             }
         },
         mounted() {
+            window.onresize = () => {
+                this.getClientSize();
+            }
             this.getClientSize();
         }
     }
@@ -146,6 +119,7 @@
             flex-direction: column;
 
             .user_guide_text {
+                font-size: 20px;
             }
 
             & > .el-button {
@@ -153,37 +127,10 @@
             }
         }
 
-        .view {
+        .user_guide_view {
             position: absolute;
-            box-sizing: border-box;
-            /*border:1px solid #000;*/
-        }
-
-        [class^="user_guide_view-"] {
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.7);
-            position: fixed;
-            transition: all 0.7s;
-        }
-
-        .user_guide_view-top {
-            height: 100vh;
-        }
-
-        .user_guide_view-bottom {
-            width: 200px;
-            /*left: 50px;*/
-            /*top: 250px;*/
-        }
-
-        .user_guide_view-left {
-            width: 100vw;
-            top: 0;
-        }
-
-        .user_guide_view-right {
-            width: 100vw;
-            top: 0;
+            border: 9999px solid rgba(0, 0, 0, 0.7);
+            transition: all 0.4s;
         }
     }
 </style>
