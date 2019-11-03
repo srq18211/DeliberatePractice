@@ -2,9 +2,23 @@
     <!-- <div id="app" class="scroll-wrapper"> -->
     <div id="app">
         <el-header>
-            <router-link to="/">home</router-link>
-            <router-link to="/exercise">exercise</router-link>
-            <router-link to="/mgmt">mgmt</router-link>
+            <el-row style="width: 1200px;margin:0 auto" type="flex" align="center" justify="space-between">
+                <nav>
+                    <router-link to="/">首页</router-link>
+                    <router-link to="/exercise">exercise</router-link>
+                    <router-link to="/mgmt">mgmt</router-link>
+                </nav>
+                <el-row type="flex" style="align-items:center">
+                    <el-dropdown style="height: 40px"
+                                 placement="bottom-end">
+                        <el-avatar> user</el-avatar>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click.native="signInUi">登录</el-dropdown-item>
+                            <el-dropdown-item @click.native="signOutUi">注销</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </el-row>
+            </el-row>
         </el-header>
         <el-container>
             <!--user view-->
@@ -50,9 +64,39 @@
         <el-footer>
             <el-row type="flex" justify="space-between">
                 <span>&copy; 2019 xinzejy.cn 京ICP备18018920号 </span>
-                <span><el-button type="text" size="mini" icon="el-icon-full-screen" @click="fullscreen">全屏</el-button></span>
+                <span>
+                    <el-button type="text"
+                               size="mini"
+                               icon="el-icon-full-screen"
+                               @click="fullscreen">全屏
+                    </el-button></span>
             </el-row>
         </el-footer>
+        <el-dialog
+                center
+                title="用户登录"
+                :visible.sync="dialogVisible"
+                width="600px"
+                :destroy-on-close="true">
+            <el-form ref="ruleForm" :model="ruleForm" label-width="80px">
+                <el-form-item label="用户名">
+                    <el-input v-model="ruleForm.user"></el-input>
+                </el-form-item>
+                <el-form-item label="密码">
+                    <el-input v-model="ruleForm.pswd"></el-input>
+                </el-form-item>
+                <span>
+                </span>
+            </el-form>
+            <el-divider content-position="center" style="font-size: 30px">
+                第三方合作账号登录
+            </el-divider>
+            <el-row type="flex" justify="space-around">
+                <i style="font-size:40px" class="fab fa-github"></i>
+                <i style="font-size:40px" class="fa fa-comments"></i>
+                <i style="font-size:40px" class="fab fa-qq"></i>
+            </el-row>
+        </el-dialog>
     </div>
 </template>
 
@@ -61,7 +105,22 @@
         name: "App",
         data() {
             return {
-                time: ""
+                time: "",
+                dialogVisible: true,
+                ruleForm: {
+                    user:"",
+                    pswd:"",
+                },
+                form_rules: {
+                    user: [
+                        {required: true, message: "请输入活动名称", trigger: "blur"},
+                        {min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur"}
+                    ],
+                    pswd: [
+                        {required: true, message: "请输入活动名称", trigger: "blur"},
+                        {min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur"}
+                    ]
+                }
             }
         },
         methods: {
@@ -72,8 +131,14 @@
                 console.log(e)
             },
             fullscreen() {
-                document.querySelector('#app').requestFullscreen();
+                document.querySelector("#app").requestFullscreen();
             },
+            signInUi() {
+                this.dialogVisible = true
+            },
+            signOutUi() {
+
+            }
         },
         mounted() {
             setInterval(() => {

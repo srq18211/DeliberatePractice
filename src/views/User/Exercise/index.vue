@@ -87,7 +87,7 @@
                 wrong: 0,
 
                 logList: [],
-                guideVisible: true,
+                guideVisible: false,
                 guide: [
                     {
                         el: ".topicQuestion",
