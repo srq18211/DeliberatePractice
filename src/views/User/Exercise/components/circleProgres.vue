@@ -1,5 +1,5 @@
 <template>
-    <svg class="circle-progress" viewBox="0,0,300,300" preserveAspectRatio="xMinYMin meet" >
+    <svg class="circle-progress" viewBox="0,0,300,300" preserveAspectRatio="xMinYMin meet">
         <circle class="circle" :cx="cx" :cy="cy" :r="`${r}`" stroke="#eaeef2"></circle>
         <circle class="circle dasharray right" :cx="cx" :cy="cy" :r="`${r}`"
                 :stroke-dasharray="`${totalLength } 99999`">
@@ -8,38 +8,35 @@
                 :stroke-dasharray="`${wrongLength } 99999`">
         </circle>
         <text x="150" y="150"
-              text-anchor="middle"
-              font-family="Verdana"
-              font-size="40">
-            <tspan font-size="15">
-                暂未完成:
-            </tspan>
-            {{total-totalV}}
+              class="text">
+            {{percentage}}
+            <tspan font-size="35">%</tspan>
+            <!--            {{total-totalV}}-->
 
         </text>
-        <text x="150" y="180"
-              text-anchor="middle"
-              font-family="Verdana"
-              fill="#9E9E9E"
-              font-size="15"
-              style="min-width:100px">
-            <tspan font-size="10">
-                已经完成:
-            </tspan>
-            {{totalV}}
-        </text>
-        <text x="150" y="200"
-              text-anchor="middle"
-              font-family="Verdana"
-              fill="#9E9E9E"
-              font-size="15"
-              style="min-width:100px">
-            <tspan font-size="10">
-                完成比例:
-            </tspan>
-            {{percentage}}
-            <tspan font-size="9">%</tspan>
-        </text>
+        <!--        <text x="150" y="180"-->
+        <!--              text-anchor="middle"-->
+        <!--              font-family="Verdana"-->
+        <!--              fill="#9E9E9E"-->
+        <!--              font-size="15"-->
+        <!--              style="min-width:100px">-->
+        <!--            <tspan font-size="10">-->
+        <!--                已经完成:-->
+        <!--            </tspan>-->
+        <!--            {{totalV}}<tspan font-size="9">%</tspan>-->
+        <!--        </text>-->
+        <!--        <text x="150" y="200"-->
+        <!--              text-anchor="middle"-->
+        <!--              font-family="Verdana"-->
+        <!--              fill="#9E9E9E"-->
+        <!--              font-size="15"-->
+        <!--              style="min-width:100px">-->
+        <!--            <tspan font-size="10">-->
+        <!--                完成比例:-->
+        <!--            </tspan>-->
+        <!--            {{percentage}}-->
+        <!--            <tspan font-size="9">%</tspan>-->
+        <!--        </text>-->
     </svg>
 </template>
 <script>
@@ -120,11 +117,17 @@
         stroke-width: 20px;
     }
 
+    .text {
+        font-size: 50px;
+        text-anchor:middle;
+        dominant-baseline: middle; /* 文本垂直居中 */
+        font-family:fantasy;
+    }
+
     .dasharray {
         transform-origin: center;
         transform: rotate(-90deg);
         transition: all 0.3s;
-
     }
 
     .right {

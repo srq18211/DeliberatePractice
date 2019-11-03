@@ -1,36 +1,50 @@
 <template>
     <div style="margin:0 auto;width: 1000px">
-        <el-card class="dashbord">
-            <div class="circle-wrap">
-                <circle-progres :right="right" :total="list.length" :wrong="wrong"></circle-progres>
-            </div>
-            {{logList}}
-        </el-card>
         <el-card :class="{'error':error}">
-            <div slot="header"> 答题卡 {{duration}}</div>
+            <div slot="header">
+                答题卡
+                {{duration}}
+            </div>
             <div class="topic-field">
-                <div class="topic">
-                    ID:{{nowTopic.id}}<h1>{{nowTopic.title}}</h1>
-                </div>
-                <el-input
-                        rows="10"
-                        ref="input"
-                        clearable
-                        v-model="input"
-                        placeholder="输入答案"
-                        autofocuse
-                        @input.native="inputHandle"
-                        @keydown.13.native="nextTopic">
-                </el-input>
-                <el-col style="margin-top: 20px;">
-                    <el-button
-                            style="width:100%"
-                            type="primary"
-                            :loading="false"
-                            @click="nextTopic"
-                            ref="nextTopic">下一题
-                    </el-button>
-                </el-col>
+                <el-row type="flex" class="topicQuestion">
+                    <div style="height:200px;width: 200px">
+                        <circle-progres :right="right" :total="list.length" :wrong="wrong"></circle-progres>
+                    </div>
+                    <div style="height: 50%">
+                        <div v-if="nowTopic.id">ID:</div>
+                        {{nowTopic.id}}<h1>{{nowTopic.title}}</h1>
+                    </div>
+                </el-row>
+                <el-row>
+                    <el-input
+                            class="topicUserInput"
+                            rows="10"
+                            ref="input"
+                            clearable
+                            v-model="input"
+                            placeholder="输入答案"
+                            autofocuse
+                            @input.native="inputHandle"
+                            @keydown.13.native="nextTopic">
+                    </el-input>
+                </el-row>
+
+                <el-row style="margin-top: 20px;" type="flex" justify="space-between" align="center">
+                    <el-button-group class="topicOperate">
+                        <el-button size="mini" type="info" icon="el-icon-star-off">收藏</el-button>
+                        <el-button size="mini" type="info" icon="el-icon-document-delete">屏蔽</el-button>
+                    </el-button-group>
+                    <el-button-group class="startBtn">
+                        <el-button v-if="index==-1"
+                                   type="primary">开始
+                        </el-button>
+                        <el-button v-else
+                                   type="primary"
+                                   @click="nextTopic"
+                                   ref="nextTopic">下一题
+                        </el-button>
+                    </el-button-group>
+                </el-row>
             </div>
         </el-card>
         <el-card>
@@ -44,14 +58,16 @@
             </div>
             <span v-if="switchV==='1'">{{nowTopic.answer}}</span>
         </el-card>
+        <user-help v-if="guideVisible" :data="guide"></user-help>
     </div>
 </template>
 
 <script>
+    import userHelp from "./components/userHelp"
     import circleProgres from "./components/circleProgres"
 
     export default {
-        components: {circleProgres},
+        components: {circleProgres, userHelp},
         data() {
             return {
                 switchV: true,
@@ -59,19 +75,35 @@
                 input: "",
                 error: false,
 
-                beginTime: new Date(),
+                beginTime: "",
 
                 duration: "",
-                currentTopicTimer: "",
-
+                ticTimer: "",
+                //题目列表
                 list: [],
-
-                index: 0,
+                index: -1,
 
                 right: 0,
                 wrong: 0,
 
-                logList: []
+                logList: [],
+                guideVisible: true,
+                guide: [
+                    {
+                        el: ".topicQuestion",
+                        message: "答题卡区域，这里会显示题目"
+                    },
+                    {
+                        el: ".topicUserInput",
+                        message: "答题卡区域，在这里输入答案，回车键可以快速提交"
+                    }, {
+                        el: ".topicOperate",
+                        message: "这里收藏或者屏蔽当前题目"
+                    }, {
+                        el: ".startBtn",
+                        message: "在没有开始之前，这里是开始按钮，点击开始答题。"
+                    }
+                ]
             };
         },
         computed: {
@@ -80,6 +112,9 @@
             },
             completed() {
                 return this.right + this.wrong || 0
+            },
+            total() {
+                return this.list.length;
             }
         },
         methods: {
@@ -101,35 +136,43 @@
             //下一道题
             nextTopic(e) {
                 e.preventDefault();
-                this.logHandle();
-                this.beginTime = new Date();
                 // e.stopPropagation();
-                if (!this.input || this.error) {
-                    this.$confirm("是否提交到错题本？", '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'error'
-                    }).then(() => {
-                        this.wrongHandle();
-                    }).catch(() => {
-                    })
+                //题目未开始
+                if (this.index === -1) {
+                    this.index++;
+                    this.ticHandle();
                     return;
                 }
-
-                //验证答案是否正确
-                this.validateInput(this.input, this.nowTopic.answer)
+                //题目已开始
+                this.checkLast()
                     .then(() => {
-                        this.rightHandle();
+                        if (!this.input || this.error) {
+                            this.$confirm("是否提交到错题本？", '提示', {
+                                confirmButtonText: '确定',
+                                cancelButtonText: '取消',
+                                type: 'error'
+                            }).then(() => {
+                                this.wrongHandle();
+                            }).catch(() => {
+                            })
+                            return;
+                        }
 
+                        //验证答案是否正确
+                        this.validateInput(this.input, this.nowTopic.answer)
+                            .then(() => {
+                                this.switchV === "1" ? this.wrongHandle() : this.rightHandle()
+                            })
+                            .catch(() => {
+                                this.wrongHandle()
+                            })
                     })
                     .catch(() => {
-                        this.wrongHandle();
+                        this.duration = ""
+                        clearInterval(this.ticTimer);
+                        return
                     })
 
-                //检查是否是最后一题
-                if(this.index===this.list.length-1){
-                    clearInterval(this.currentTopicTimer)
-                }
             },
             //验证答案
             validateInput(v1, v2) {
@@ -139,25 +182,33 @@
             },
             //题目正确切换
             rightHandle() {
-                //获取题目总数
-                let total = this.list.length;
-                this.index = Math.min(++this.index, total - 1)
-                this.right = Math.min(total - this.wrong, ++this.right)
-                this.input = ""
+                return new Promise((resolve, reject) => {
+                    //获取题目总数
+                    this.index = Math.min(++this.index, this.total - 1);
+                    this.right = Math.min(this.total - this.wrong, ++this.right)
+                    this.input = "";
+                    this.logHandle()
+                    resolve()
+                })
             },
             //题目错误切换
             wrongHandle() {
-                //获取题目总数
-                let total = this.list.length;
-                this.index = Math.min(++this.index, total)
-                this.wrong = Math.min(total - this.right, ++this.wrong)
-                this.input = ""
+                return new Promise((resolve, reject) => {
+                    //获取题目总数
+                    this.index = Math.min(++this.index, this.total);
+                    this.wrong = Math.min(this.total - this.right, ++this.wrong)
+                    this.input = "";
+                    this.logHandle()
+                    resolve()
+                })
             },
-            logHandle(topicId, time) {
+            logHandle(validate) {
                 this.logList.push({
                     topicId: this.nowTopic.id,
-                    time: this.duration
-                })
+                    time: this.duration,
+                    validate
+                });
+                this.ticHandle();
             },
             /**
              * @desc 对比字符串，返回不同索引数组
@@ -168,11 +219,20 @@
                 if (!value || !str) return;
                 this.error = (value !== str.slice(0, value.length))
             },
-            userInputTimer() {
-                clearInterval(this.currentTopicTimer)
-                this.currentTopicTimer = setInterval(() => {
+            ticHandle() {
+                console.log("tic")
+                clearInterval(this.ticTimer);
+                this.beginTime = "";
+                this.beginTime = new Date();
+                this.ticTimer = setInterval(() => {
                     this.duration = new Date() - this.beginTime
-                },60)
+                }, 60)
+            },
+            checkLast() {
+                return new Promise((resolve, reject) => {
+                    //检查是否是最后一题
+                    this.index === this.list.length ? reject() : resolve()
+                })
             }
         },
         created() {
@@ -192,10 +252,10 @@
                 loading.close();
                 // this.$router.back();
             });
-            this.userInputTimer()
+            // this.ticHandle()
         },
         destroyed() {
-            clearInterval(this.currentTopicTimer)
+            clearInterval(this.ticTimer)
         }
     };
 </script>
@@ -205,10 +265,6 @@
     .el-card {
         /*height: 300px;*/
         margin-bottom: 20px;
-
-        .circle-wrap {
-            width: 200px;
-        }
     }
 
     .error {
@@ -216,21 +272,17 @@
     }
 
     .topic-field {
-        height: 30vh;
+        min-height: 40vh;
         overflow: hidden;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-    }
-
-    .topic {
-        min-height: 100px;
-        font-size: 20px;
-        line-height: 30px;
+        /*align-items: center;*/
     }
 
     .tools {
         height: 50px;
     }
+
 </style>
 
