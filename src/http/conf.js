@@ -1,7 +1,7 @@
 const env = process.env.NODE_ENV;
 const AXIOS_CONF = {
     baseURL: env === "development"
-        ? "http://localhost:8090"
+        ? "/localapi"
         : "http://xinzejy.cn:3000",
     // baseURL: "/localapi",
     timeout: 5000,

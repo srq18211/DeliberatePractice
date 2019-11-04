@@ -13,7 +13,7 @@
                                  placement="bottom-end">
                         <el-avatar> user</el-avatar>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native="signInUi">登录</el-dropdown-item>
+                            <el-dropdown-item @click.native="signDialogVsb=true">登录</el-dropdown-item>
                             <el-dropdown-item @click.native="signOutUi">注销</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
@@ -75,69 +75,93 @@
         <el-dialog
                 center
                 title="用户登录"
-                :visible.sync="dialogVisible"
+                :visible.sync="signDialogVsb"
                 width="600px"
                 :destroy-on-close="true">
-            <el-form ref="ruleForm" :model="ruleForm" label-width="80px">
-                <el-form-item label="用户名">
-                    <el-input v-model="ruleForm.user"></el-input>
+            <el-form ref="userSign"
+                     :rules="form_rules"
+                     :model="ruleForm"
+                     label-width="80px">
+                <el-form-item label="用户名" prop="username">
+                    <el-input v-model="ruleForm.username"></el-input>
                 </el-form-item>
-                <el-form-item label="密码">
-                    <el-input v-model="ruleForm.pswd"></el-input>
+                <el-form-item label="密码" prop="password">
+                    <el-input type="password" v-model="ruleForm.password"></el-input>
                 </el-form-item>
-                <span>
-                </span>
+                <el-form-item>
+                    <el-button type="primary" style="width:100%" @click="siginInRemote('userSign')">登录</el-button>
+                </el-form-item>
             </el-form>
-            <el-divider content-position="center" style="font-size: 30px">
-                第三方合作账号登录
-            </el-divider>
-            <el-row type="flex" justify="space-around">
-                <i style="font-size:40px" class="fab fa-github"></i>
-                <i style="font-size:40px" class="fa fa-comments"></i>
-                <i style="font-size:40px" class="fab fa-qq"></i>
-            </el-row>
+            <!--            <el-divider content-position="center" style="font-size: 30px">-->
+            <!--                第三方合作账号登录-->
+            <!--            </el-divider>-->
+            <!--            <el-row type="flex" justify="space-around">-->
+            <!--                <i style="font-size:40px" class="sign_btn fab fa-github"></i>-->
+            <!--                <i style="font-size:40px" class="sign_btn fa fa-comments"></i>-->
+            <!--                <i style="font-size:40px" class="sign_btn fab fa-qq"></i>-->
+            <!--            </el-row>-->
         </el-dialog>
     </div>
 </template>
 
 <script>
+    import Cookie from "js-cookie"
+
     export default {
         name: "App",
         data() {
             return {
                 time: "",
-                dialogVisible: true,
+                signDialogVsb: false,
                 ruleForm: {
-                    user:"",
-                    pswd:"",
+                    username: "",
+                    password: "",
                 },
                 form_rules: {
-                    user: [
+                    username: [
                         {required: true, message: "请输入活动名称", trigger: "blur"},
-                        {min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur"}
+                        {min: 5, max: 18, message: "长度在 6 到 8 个字符", trigger: "blur"}
                     ],
-                    pswd: [
+                    password: [
                         {required: true, message: "请输入活动名称", trigger: "blur"},
-                        {min: 3, max: 5, message: "长度在 3 到 5 个字符", trigger: "blur"}
+                        {min: 5, max: 18, message: "长度在 6 到 8 个字符", trigger: "blur"}
                     ]
                 }
             }
         },
         methods: {
             handleOpen(e) {
-                console.log(e)
             },
             handleClose(e) {
-                console.log(e)
             },
             fullscreen() {
                 document.querySelector("#app").requestFullscreen();
             },
-            signInUi() {
-                this.dialogVisible = true
+            siginInRemote(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.$axios.post("/api/user/login", {
+                            ...this.ruleForm
+                        }).then(res => {
+                            this.signDialogVsb = false;
+                            const {code} = res.data;
+                            if (code !== 0) {
+                                return
+                            }
+                            this.$message({
+                                message: "登录成功!",
+                                type: "success"
+                            });
+                            Cookie.set("login", "online", {expires: 7})
+                        })
+                    } else {
+                        alert("检查格式");
+                        return false
+                    }
+                })
             },
-            signOutUi() {
-
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
             }
         },
         mounted() {
@@ -158,6 +182,10 @@
         background: #eceef1;
         overflow: hidden;
         /*zoom: 0.75;*/
+        .el-avatar {
+            cursor: pointer;
+        }
+
         .el-header, .el-footer {
             color: #fff;
             line-height: 60px;
@@ -175,24 +203,26 @@
             }
         }
 
-        .el-header {
-            top: 0;
-        }
-
         .el-footer {
             bottom: 0;
         }
 
         .el-container {
             height: 100%;
-            /*min-width: 1500px;*/
             box-sizing: border-box;
-            padding: 60px 0;
+            padding: 50px 0;
 
             .el-main {
                 .router-view {
                     height: 100%;
                 }
+            }
+        }
+
+        .sign_btn {
+            &:hover {
+                cursor: pointer;
+                color: #F44336;
             }
         }
     }
