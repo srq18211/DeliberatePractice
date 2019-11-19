@@ -1,288 +1,149 @@
 <template>
-    <div style="margin:0 auto;width: 1000px">
-        <el-card :class="{'error':error}">
-            <div slot="header">
-                答题卡
-                {{duration}}
-            </div>
-            <div class="topic-field">
-                <el-row type="flex" class="topicQuestion">
-                    <div style="height:200px;width: 200px">
-                        <circle-progres :right="right" :total="list.length" :wrong="wrong"></circle-progres>
-                    </div>
-                    <div style="height: 50%">
-                        <span v-if="nowTopic.id">ID:</span>{{nowTopic.id}}<h1>{{nowTopic.title}}</h1>
-                    </div>
-                </el-row>
-                <el-row>
-                    <el-input
-                            class="topicUserInput"
-                            rows="10"
-                            ref="input"
-                            clearable
-                            v-model="input"
-                            placeholder="输入答案"
-                            autofocuse
-                            @input.native="inputHandle"
-                            @keydown.13.native="nextTopic">
-                    </el-input>
-                </el-row>
+  <div style="margin:0 auto;width: 1000px">
+    <el-card :class="{'error':error}">
+      <div slot="header">
+        答题卡:
+        <span>{{index}}/{{listTotal}}</span>
+        <span v-if="index<0">点击开始按钮或者在答案区域按下回车键开始练习题目</span>
+        <!-- <el-button @click="guideVisible=true">查看帮助</el-button> -->
+        <!-- <el-button @click="showSelector=true">选择题库</el-button> -->
+        <!-- <el-button>错题重做</el-button>    -->
+      </div>
+      <div class="topic-field">
+        <el-row type="flex" class="topicQuestion">
+          <div style="height:200px;width: 200px">
+            <circle-progres :right="right" :total="list.length" :wrong="wrong"></circle-progres>
+          </div>
+          <div style="height: 50%">
+            <span v-if="nowTopic.id">ID:</span>
+            {{nowTopic.id}}
+            <h1>{{nowTopic.title}}</h1>
+          </div>
+        </el-row>
+        <el-row>
+          <el-input
+            class="topicUserInput"
+            rows="10"
+            ref="input"
+            clearable
+            v-model="userInputAnswer"
+            placeholder="输入答案"
+            autofocuse
+            @keyup.native="inputHandle"
+            @keydown.13.native="nextTopic"
+          ></el-input>
+        </el-row>
+        <el-row style="margin-top: 20px;" type="flex" justify="space-between" align="center">
+          <el-button-group class="topicOperate">
+            <!-- <el-button size="mini" type="info" icon="el-icon-star-off">收藏</el-button> -->
+            <!-- <el-button size="mini" type="info" icon="el-icon-document-delete">屏蔽</el-button> -->
+            <el-button size="mini" type="info" @click="guideVisible=true" icon="el-icon-document-delete">查看帮助</el-button>
+          </el-button-group>
+          <el-button-group class="startBtn">
+            <el-button v-if="beforeStart" type="primary" @click="index++">开始</el-button>
+            <el-button v-if="started" type="primary" @click="nextTopic" ref="nextTopic">下一题(回车键)</el-button>
+            <el-button v-if="finished" type="primary" @click="reset">重新开始</el-button>
+          </el-button-group>
+        </el-row>
+      </div>
+    </el-card>
+    <el-card>
+      <el-row slot="header" type="flex" align="center">
+        <el-switch
+          style="margin-right:20px"
+          v-model="showAnswer"
+          active-value="true"
+          inactive-value="false"
+        ></el-switch>显示答案后提交，不能算作已掌握哦
+      </el-row>
+      <span v-if="showAnswer==='true'">答案：{{nowTopic.answer}}</span>
+    </el-card>
+    <el-dialog title="选择题目" :fullscreen="false" :visible.sync="showSelector">
+      <el-row type="flex" justify="space-between">
+        <el-input
+          size="mini"
+          style="margin-left:20px;width: 500px;"
+          placeholder="请输入内容"
+          v-model="fuzzyInput"
+          @keydown.enter.native="queryList"
+          clearable
+          class="input-with-select"
+        >
+          <el-select
+            size="mini"
+            style="width: 100px"
+            v-model="fuzzyKey"
+            slot="prepend"
+            @change="pageNo=1"
+            placeholder="请选择"
+          >
+            <el-option style="text-align: center;line-height: 36px;" label="题目" value="keyword"></el-option>
+            <el-option style="text-align: center;line-height: 36px;" label="作者" value="author"></el-option>
+          </el-select>
+          <el-button slot="append" icon="el-icon-search" @click.native="queryList"></el-button>
+        </el-input>
+        <el-button size="mini" type="success">添加到本次练习计划</el-button>
+      </el-row>
+      <div class="dialog-body-scrollwrap">
 
-                <el-row style="margin-top: 20px;" type="flex" justify="space-between" align="center">
-                    <el-button-group class="topicOperate">
-                        <el-button size="mini" type="info" icon="el-icon-star-off">收藏</el-button>
-                        <el-button size="mini" type="info" icon="el-icon-document-delete">屏蔽</el-button>
-                    </el-button-group>
-                    <el-button-group class="startBtn">
-                        <el-button v-if="index==-1"
-                                   type="primary">开始
-                        </el-button>
-                        <el-button v-else
-                                   type="primary"
-                                   @click="nextTopic"
-                                   ref="nextTopic">下一题
-                        </el-button>
-                    </el-button-group>
-                </el-row>
-            </div>
-        </el-card>
-        <el-card>
-            <el-row slot="header" type="flex" align="center">
-                <el-switch
-                        style="margin-right:20px"
-                        v-model="switchV"
-                        active-value="1"
-                        inactive-value="0">
-                </el-switch>
-                显示答案后提交，不能算作已掌握哦
-            </el-row>
-            <span v-if="switchV==='1'">{{nowTopic.answer}}</span>
-        </el-card>
-        <user-help v-if="guideVisible" :data="guide"></user-help>
-    </div>
+      </div>
+      <el-row type="flex" justify="space-between" style="margin:20px 0">
+        <el-pagination
+          class="pagination"
+          background
+          layout="prev, pager, next"
+          :current-page.sync="pageNo"
+          @current-change="currentChange"
+          :total="pageCount"
+        ></el-pagination>
+      </el-row>
+    </el-dialog>
+    <user-guide v-model="guideVisible" :data="guideData"></user-guide>
+  </div>
 </template>
 
 <script>
-    import userHelp from "./components/userHelp"
-    import circleProgres from "./components/circleProgres"
+import userGuide from "./components/userHelp";
+import circleProgres from "./components/circleProgres";
 
-    export default {
-        components: {circleProgres, userHelp},
-        data() {
-            return {
-                switchV: true,
-
-                input: "",
-                error: false,
-
-                beginTime: "",
-
-                duration: "",
-                ticTimer: "",
-                //题目列表
-                list: [],
-                index: -1,
-
-                right: 0,
-                wrong: 0,
-
-                logList: [],
-                guideVisible: false,
-                guide: [
-                    {
-                        el: ".topicQuestion",
-                        message: "答题卡区域，这里会显示题目"
-                    },
-                    {
-                        el: ".topicUserInput",
-                        message: "答题卡区域，在这里输入答案，回车键可以快速提交"
-                    }, {
-                        el: ".topicOperate",
-                        message: "这里收藏或者屏蔽当前题目"
-                    }, {
-                        el: ".startBtn",
-                        message: "在没有开始之前，这里是开始按钮，点击开始答题。"
-                    }
-                ]
-            };
-        },
-        computed: {
-            nowTopic() {
-                return this.list[this.index] || {}
-            },
-            completed() {
-                return this.right + this.wrong || 0
-            },
-            total() {
-                return this.list.length;
-            }
-        },
-        methods: {
-            //乱序
-            shuffle(arr) {
-                for (let i = arr.length - 1; i >= 0; i--) {
-                    let rIndex = Math.floor(Math.random() * (i + 1));
-                    let temp = arr[rIndex];
-                    arr[rIndex] = arr[i];
-                    arr[i] = temp;
-                }
-                return arr;
-            },
-            //输入事件
-            inputHandle(e) {
-                e.preventDefault();
-                this.diffValue(this.input, this.nowTopic.answer)
-            },
-            //下一道题
-            nextTopic(e) {
-                e.preventDefault();
-                // e.stopPropagation();
-                //题目未开始
-                if (this.index === -1) {
-                    this.index++;
-                    this.ticHandle();
-                    return;
-                }
-                //题目已开始
-                this.checkLast()
-                    .then(() => {
-                        if (!this.input || this.error) {
-                            this.$confirm("是否提交到错题本？", '提示', {
-                                confirmButtonText: '确定',
-                                cancelButtonText: '取消',
-                                type: 'error'
-                            }).then(() => {
-                                this.wrongHandle();
-                            }).catch(() => {
-                            })
-                            return;
-                        }
-
-                        //验证答案是否正确
-                        this.validateInput(this.input, this.nowTopic.answer)
-                            .then(() => {
-                                this.switchV === "1" ? this.wrongHandle() : this.rightHandle()
-                            })
-                            .catch(() => {
-                                this.wrongHandle()
-                            })
-                    })
-                    .catch(() => {
-                        this.duration = ""
-                        clearInterval(this.ticTimer);
-                        return
-                    })
-
-            },
-            //验证答案
-            validateInput(v1, v2) {
-                return new Promise((resolve, reject) => {
-                    v1 === v2 ? resolve() : reject()
-                })
-            },
-            //题目正确切换
-            rightHandle() {
-                return new Promise((resolve, reject) => {
-                    //获取题目总数
-                    this.index = Math.min(++this.index, this.total - 1);
-                    this.right = Math.min(this.total - this.wrong, ++this.right)
-                    this.input = "";
-                    this.logHandle()
-                    resolve()
-                })
-            },
-            //题目错误切换
-            wrongHandle() {
-                return new Promise((resolve, reject) => {
-                    //获取题目总数
-                    this.index = Math.min(++this.index, this.total);
-                    this.wrong = Math.min(this.total - this.right, ++this.wrong)
-                    this.input = "";
-                    this.logHandle()
-                    resolve()
-                })
-            },
-            logHandle(validate) {
-                this.logList.push({
-                    topicId: this.nowTopic.id,
-                    time: this.duration,
-                    validate
-                });
-                this.ticHandle();
-            },
-            /**
-             * @desc 对比字符串，返回不同索引数组
-             * @param value
-             * @param str
-             */
-            diffValue(value, str) {
-                if (!value || !str) return;
-                this.error = (value !== str.slice(0, value.length))
-            },
-            ticHandle() {
-                console.log("tic")
-                clearInterval(this.ticTimer);
-                this.beginTime = "";
-                this.beginTime = new Date();
-                this.ticTimer = setInterval(() => {
-                    this.duration = new Date() - this.beginTime
-                }, 60)
-            },
-            checkLast() {
-                return new Promise((resolve, reject) => {
-                    //检查是否是最后一题
-                    this.index === this.list.length ? reject() : resolve()
-                })
-            }
-        },
-        created() {
-            let loading = this.$loading({
-                target: ".el-container",
-                text: "loading"
-            });
-            this.$axios.get("/api/topic/list?pageSize=150").then(rep => {
-                const list = rep["data"].data["listData"];
-                return new Promise((resolve, reject) => {
-                    list ? resolve(list) : reject()
-                })
-            }).then(data => {
-                this.list = this.shuffle(data);
-                loading.close();
-            }).catch(err => {
-                loading.close();
-                // this.$router.back();
-            });
-            // this.ticHandle()
-        },
-        destroyed() {
-            clearInterval(this.ticTimer)
-        }
-    };
+import mixins from "./mixins";
+export default {
+  mixins: [mixins],
+  components: { circleProgres, userGuide },
+  created() {
+    this.queryList();
+  }
+};
 </script>
 <style lang="scss" rel="stylesheet/scss" scoped>
-    @import "../../../assets/main";
+@import "../../../assets/main";
 
-    .el-card {
-        /*height: 300px;*/
-        margin-bottom: 20px;
-    }
+.el-card {
+  /*height: 300px;*/
+  margin-bottom: 20px;
+}
 
-    .error {
-        color: #F44336;
-    }
+.error {
+  color: #f44336;
+}
 
-    .topic-field {
-        min-height: 40vh;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        /*align-items: center;*/
-    }
+.topic-field {
+  min-height: 40vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /*align-items: center;*/
+}
 
-    .tools {
-        height: 50px;
-    }
+.tools {
+  height: 50px;
+}
 
+.dialog-body-scrollwrap {
+  margin-top: 20px;
+  height: 60vh;
+  overflow-y: scroll;
+}
 </style>
 

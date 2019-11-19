@@ -1,5 +1,5 @@
 <template>
-    <div class="user_guide_mask" v-show="show">
+    <div class="user_guide_mask" v-show="value">
         <div class="user_guide_view" :style="view"></div>
 
         <div class="user_guide_message" :style="messageStyle">
@@ -22,6 +22,10 @@
                 default: function () {
                     return []
                 }
+            },
+            value:{
+                type:[Boolean],
+                default:false
             }
         },
         data() {
@@ -72,6 +76,7 @@
         methods: {
             getClientSize() {
                 let el = document.querySelector(this.data[this.index].el);
+                if(!el)return
                 this.currentElement = el.getBoundingClientRect() || {}
             },
             pre() {
@@ -87,7 +92,8 @@
                 this.getClientSize();
             },
             close() {
-                this.show = false
+                this.$emit("input",false)
+                this.index = 0
             }
         },
         mounted() {

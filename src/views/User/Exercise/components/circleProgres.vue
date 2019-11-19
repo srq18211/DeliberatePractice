@@ -140,7 +140,7 @@
 
         &:hover {
             cursor: pointer;
-            stroke-width: 17px;
+            stroke-width: 50px;
         }
     }
 </style>

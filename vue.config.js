@@ -8,8 +8,8 @@ module.exports = {
         if (process.env.NODE_ENV === "production") {
             return {
                 plugins: [new CompressionPlugin({
-                    test: /\.js$|\.html$|\.css/,
-                    threshold: 10240,
+                    test: /.(js|css|svg|woff|ttf|json|html)$/,
+                    threshold: 500,
                     deleteOriginalAssets: false
                 })]
             }
@@ -23,7 +23,8 @@ module.exports = {
         open: false, //项目启动时是否自动打开浏览器，我这里设置为false,不打开，true表示打开
         proxy: {
             "/localapi": {
-                target: "http://127.0.0.1:8090", //服务器api地址
+                target: "http://127.0.0.1:9000", //服务器api地址
+                // target: "http://xinzejy.cn:3000", //服务器api地址
                 changeOrigin: true, //是否跨域
                 ws: true, // proxy websockets
                 pathRewrite: {

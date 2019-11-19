@@ -7,11 +7,12 @@ const routes = [
     {
         path: "/",
         name: "index",
-        component: resolve => require(['@/views/Home/index.vue'], resolve),
+        component: () => import('@/views/Home/index.vue'),
     },
     {
-        path: "/exercise",
+        path: "/exercise/:type?",
         name: "exercise",
+        props:true,
         meta: {user: true},
         component: resolve => require(['@/views/User/Exercise/index.vue'], resolve),
     }, {
@@ -24,6 +25,7 @@ const routes = [
 routes.forEach(item => item.props = true);
 const router = new Router({
     mode: "history",
+    base:"/",
     routes
 });
 

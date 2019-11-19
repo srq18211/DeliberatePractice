@@ -5,8 +5,8 @@
             <el-row style="width: 1200px;margin:0 auto" type="flex" align="center" justify="space-between">
                 <nav>
                     <router-link to="/">首页</router-link>
-                    <router-link to="/exercise">exercise</router-link>
-                    <router-link to="/mgmt">mgmt</router-link>
+                    <!-- <router-link to="/exercise">知识点练习</router-link> -->
+                    <router-link to="/mgmt">题库管理</router-link>
                 </nav>
                 <el-row type="flex" style="align-items:center">
                     <el-dropdown style="height: 40px"
@@ -14,7 +14,7 @@
                         <el-avatar> user</el-avatar>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item @click.native="signDialogVsb=true">登录</el-dropdown-item>
-                            <el-dropdown-item @click.native="signOutUi">注销</el-dropdown-item>
+                            <el-dropdown-item @click.native="signOut">注销</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </el-row>
@@ -24,37 +24,7 @@
             <!--user view-->
             <router-view class="view two" name="user_menu">
                 <el-aside style="overflow-y: scroll;background: #545c64">
-                    <el-menu
-                            mode="vertical"
-                            width="200"
-                            default-active="2"
-                            class="el-menu-vertical-demo"
-                            @open="handleOpen"
-                            @close="handleClose"
-                            background-color="#545c64"
-                            text-color="#fff"
-                            active-text-color="#ffd04b">
-                        <el-submenu index="1">
-                            <template slot="title">
-                                <i class="el-icon-location"></i>
-                                <span>题库管理</span>
-                            </template>
-                            <el-menu-item-group>
-                                <!--                            <template slot="title">科目管理</template>-->
-                                <el-menu-item index="1-1"> 科目管理</el-menu-item>
-                            </el-menu-item-group>
-                        </el-submenu>
-                        <el-submenu index="2">
-                            <template slot="title">
-                                <i class="el-icon-location"></i>
-                                <span>科目管理</span>
-                            </template>
-                            <el-menu-item-group>
-                                <!--                            <template slot="title">科目管理</template>-->
-                                <el-menu-item index="1-2"> 科目管理</el-menu-item>
-                            </el-menu-item-group>
-                        </el-submenu>
-                    </el-menu>
+
                 </el-aside>
             </router-view>
             <el-main>
@@ -73,6 +43,7 @@
             </el-row>
         </el-footer>
         <el-dialog
+                :close-on-click-modal="false"
                 center
                 title="用户登录"
                 :visible.sync="signDialogVsb"
@@ -130,44 +101,42 @@
             }
         },
         methods: {
-            handleOpen(e) {
-            },
-            handleClose(e) {
-            },
             fullscreen() {
                 document.querySelector("#app").requestFullscreen();
             },
+            //远程登陆，客户端状态存储
             siginInRemote(formName) {
                 this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.$axios.post("/api/user/login", {
-                            ...this.ruleForm
-                        }).then(res => {
-                            this.signDialogVsb = false;
-                            const {code} = res.data;
-                            if (code !== 0) {
-                                return
-                            }
-                            this.$message({
-                                message: "登录成功!",
-                                type: "success"
-                            });
-                            Cookie.set("login", "online", {expires: 7})
-                        })
-                    } else {
+                    if (!valid) {
                         alert("检查格式");
                         return false
                     }
+                    this.$axios.post("/api/user/login", {
+                        ...this.ruleForm
+                    }).then(res => {
+                        this.signDialogVsb = false;
+                        const {code} = res.data;
+                        if (code !== 0) {
+                            return
+                        }
+                        this.$message({
+                            message: "登录成功!",
+                            type: "success"
+                        });
+                        Cookie.set("login", "online", {expires: 1})
+                    })
+
                 })
             },
+            //客户端清理session
+            signOut() {
+                Cookie.set("login", "offline", {expires: 1});
+                this.$router.push("/")
+            },
+            //重置表单
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             }
-        },
-        mounted() {
-            setInterval(() => {
-                this.time = new Date().toLocaleString()
-            })
         },
         destroyed() {
             clearInterval(this.time)
